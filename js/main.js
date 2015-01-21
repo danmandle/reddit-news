@@ -1,11 +1,13 @@
 $(document).ready(function() {
 	startInterval();
+	addSubreddits();
 	addPostToDOM();
 });
 
 var subreddits = [
 	'usnews',
-	'worldnews'
+	'worldnews',
+	'news'
 ]
 
 var oldestPost = {
@@ -26,6 +28,22 @@ function startInterval(){
 
 }
 
+function addSubreddits(){
+	var subsForDisplay = '';
+	for(var i=0; i<subreddits.length; i++){
+		subsForDisplay += '/r/' + subreddits[i];
+		// if(i < subreddits.length - 1){
+		// 	subsForDisplay += ', & ';
+		// }
+		// else
+		if(i < subreddits.length - 1){
+			// end of subs
+			subsForDisplay += ', ';
+		}
+	}
+	$('#fromSubreddits').text(subsForDisplay);
+}
+
 function addPostToDOM(){
 	// console.log("left in array", redditPosts.length)
 	if(redditPosts.length < 5 && !currentlyFetching){
@@ -38,19 +56,21 @@ function addPostToDOM(){
 
 		var newPost = $('<div class="post"></div>');
 
-		var title = $('<div>').addClass('title').text('/r/'+post.subreddit + ' ' + post.title);
+		// var title = $('<div>').addClass('title').text('/r/'+post.subreddit + ' ' + post.title);
+		var title = $('<div>').addClass('title').text(post.title);
 		newPost.append(title);
 
 		// var ago =
 
 		var details = $('<div>').addClass('details');
-		var detailsBody = '<i class="fa fa-arrow-up"></i>'
-			detailsBody += post.score.toLocaleString();
-			detailsBody += '<a href="http://reddit.com'+post.permalink+'" target="_blank"><i class="fa fa-reddit"></i></a>';
-			detailsBody += '<a href="'+post.url+'" target="_blank"><i class="fa fa-external-link"></i></a>';
-			detailsBody += '<a href="http://reddit.com'+post.permalink+'" target="_blank"><i class="fa fa-comments-o"></i>'+post.num_comments.toLocaleString()+'</a>';
-			detailsBody += 'Posted by /u/'+post.author;
-			detailsBody += '<span data-livestamp="'+post.created+'"></span>';
+		var detailsBody = '<a href="http://reddit.com/r/'+post.subreddit+'">/r/'+post.subreddit+'</a> '
+			detailsBody += '<i class="fa fa-arrow-up"></i> '
+			detailsBody += post.score.toLocaleString() + ' ';
+			detailsBody += '<a href="http://reddit.com'+post.permalink+'" target="_blank"><i class="fa fa-reddit"></i></a> ';
+			detailsBody += '<a href="'+post.url+'" target="_blank"><i class="fa fa-external-link"></i></a> ';
+			detailsBody += '<a href="http://reddit.com'+post.permalink+'" target="_blank"><i class="fa fa-comments-o"></i>'+post.num_comments.toLocaleString()+'</a> ';
+			detailsBody += 'Posted by /u/'+post.author + ' ';
+			detailsBody += '<span data-livestamp="'+post.created_utc+'"></span>';
 		details.html(detailsBody);
 		newPost.append(details);
 
@@ -84,8 +104,8 @@ function fetchRedditPosts(callback) {
 	console.log('fetching posts');
 	currentlyFetching = true;
 	$.ajax({
-		// url: 'http://www.reddit.com/r/'+ subreddits.join('+') +'/hot.json?limit=100',
-		url: 'sampleRedditData.json',
+		url: 'http://www.reddit.com/r/'+ subreddits.join('+') +'/hot.json?limit=100',
+		// url: 'sampleRedditData.json',
 		cache: false
 	}).done(function(data) {
 		console.log('posts back from reddit',data.data.children.length)
