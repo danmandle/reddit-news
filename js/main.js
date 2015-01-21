@@ -1,6 +1,6 @@
 $(document).ready(function() {
 	startInterval();
-	addSubreddits();
+	addSubredditsToTitle();
 	addPostToDOM();
 });
 
@@ -28,7 +28,7 @@ function startInterval(){
 
 }
 
-function addSubreddits(){
+function addSubredditsToTitle(){
 	var subsForDisplay = '';
 	for(var i=0; i<subreddits.length; i++){
 		subsForDisplay += '/r/' + subreddits[i];
@@ -60,8 +60,6 @@ function addPostToDOM(){
 		var title = $('<div>').addClass('title').text(post.title);
 		newPost.append(title);
 
-		// var ago =
-
 		var details = $('<div>').addClass('details');
 		var detailsBody = '<a href="http://reddit.com/r/'+post.subreddit+'">/r/'+post.subreddit+'</a> '
 			detailsBody += '<i class="fa fa-arrow-up"></i> '
@@ -74,11 +72,19 @@ function addPostToDOM(){
 		details.html(detailsBody);
 		newPost.append(details);
 
+		var sizePercent = post.score / largestUpvotes[post.subreddit];
+
+		// 150 = 1.5 em + 1 em for min size
+		var fontSize = ((sizePercent * 150) / 100) + 1;
+
+		newPost.children('.title').css('font-size', fontSize + 'em');
+
 		newPost.css({
 			display: 'none'
 		});
 
-		newPost.appendTo('#postContainer').show('slow');
+		// newPost.appendTo('#postContainer').show('slow');
+		newPost.appendTo('#postContainer').slideDown('slow');
 
 		newPost.hover(function(){
 			// mouseenter
@@ -100,6 +106,8 @@ var debounceShowDetails = _.debounce(function(self){
 		$(self).children('.details').show('slow');
 	}, 500);
 
+var largestUpvotes = {};
+
 function fetchRedditPosts(callback) {
 	console.log('fetching posts');
 	currentlyFetching = true;
@@ -112,13 +120,17 @@ function fetchRedditPosts(callback) {
 		data.data.children.forEach(function(post) {
 			redditPosts.push(post.data);
 
-			if(post.data.created_utc > newestPost.timestamp) {
-				newestPost.timestamp = post.data.created_utc;
-				newestPost.id = post.data.id;
-			}
-			if(post.data.created_utc < oldestPost.timestamp) {
-				oldestPost.timestamp = post.data.created_utc;
-				oldestPost.id = post.data.id;
+			// if(post.data.created_utc > newestPost.timestamp) {
+			// 	newestPost.timestamp = post.data.created_utc;
+			// 	newestPost.id = post.data.id;
+			// }
+			// if(post.data.created_utc < oldestPost.timestamp) {
+			// 	oldestPost.timestamp = post.data.created_utc;
+			// 	oldestPost.id = post.data.id;
+			// }
+
+			if(!largestUpvotes[post.data.subreddit] || post.data.score > largestUpvotes[post.data.subreddit]){
+				largestUpvotes[post.data.subreddit] = post.data.score;
 			}
 
 		});
