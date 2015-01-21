@@ -2,6 +2,8 @@ $(document).ready(function() {
 	startInterval();
 	addSubredditsToTitle();
 	addPostToDOM();
+	getLocalStorage();
+	window.onbeforeunload = beforeUnload;
 });
 
 var subreddits = [
@@ -20,12 +22,26 @@ var newestPost = {
 };
 
 var redditPosts = [];
+var postsSeen = {};
+var highestUpvotes = {};
 var interval;
 var currentlyFetching = false;
 
+function beforeUnload(){
+	saveLocalStorage();
+	return null; // any non-void return will create an alert to the user
+}
+
 function startInterval(){
 	interval = setInterval(addPostToDOM, 2000);
+}
 
+function getLocalStorage() {
+	var postsSeenLS = JSON.parse(localStorage.getItem('postsSeen'))
+	postsSeen = (postsSeenLS) ? postsSeenLS : {};
+}
+function saveLocalStorage() {
+	localStorage.setItem('postsSeen', JSON.stringify(postsSeen));
 }
 
 function addSubredditsToTitle(){
@@ -45,21 +61,32 @@ function addSubredditsToTitle(){
 }
 
 function addPostToDOM(){
-	// console.log("left in array", redditPosts.length)
 	if(redditPosts.length < 5 && !currentlyFetching){
-		console.log("right here", redditPosts.length);
 		currentlyFetching = true;
 		fetchRedditPosts(addPostToDOM);
 	}
 	else if (!currentlyFetching) {
 		var post = redditPosts.pop();
 
+		var seen = false;
+		var scoreDiff = 0;
+		if(post.id in postsSeen){
+			seen = true;
+			scoreDiff = post.score - postsSeen[post.id];
+		}
+
+		postsSeen[post.id] = post.score;
+
 		var newPost = $('<div class="post"></div>');
 
 		// var title = $('<div>').addClass('title').text('/r/'+post.subreddit + ' ' + post.title);
-		var title = $('<div>').addClass('title').text(post.title);
+		var titleText = (seen) ? post.title : '<i class="fa fa-certificate"></i> ' + post.title;
+		titleText += (scoreDiff >= 50) ? ' <i class="fa fa-line-chart"></i> +' + scoreDiff.toLocaleString() : '';
+		var title = $('<div>').addClass('title').html(titleText);
 		newPost.append(title);
 
+
+		// TODO: move this to an Underscore template
 		var details = $('<div>').addClass('details');
 		var detailsBody = '<a href="https://reddit.com/r/'+post.subreddit+'">/r/'+post.subreddit+'</a> '
 			detailsBody += '<i class="fa fa-arrow-up"></i> '
@@ -72,10 +99,10 @@ function addPostToDOM(){
 		details.html(detailsBody);
 		newPost.append(details);
 
-		var sizePercent = post.score / largestUpvotes[post.subreddit];
+		var sizePercent = post.score / highestUpvotes[post.subreddit];
 
-		// 150 = 1.5 em + 1 em for min size
-		var fontSize = ((sizePercent * 150) / 100) + 1;
+		// in ems
+		var fontSize = (sizePercent * 2) + 1;
 
 		newPost.children('.title').css('font-size', fontSize + 'em');
 
@@ -84,7 +111,10 @@ function addPostToDOM(){
 		});
 
 		// newPost.appendTo('#postContainer').show('slow');
-		newPost.appendTo('#postContainer').slideDown('slow');
+
+		var speed = 500 * (1+(sizePercent*2));
+
+		newPost.appendTo('#postContainer').slideDown(speed);
 
 		newPost.hover(function(){
 			// mouseenter
@@ -106,10 +136,8 @@ var debounceShowDetails = _.debounce(function(self){
 		$(self).children('.details').show('slow');
 	}, 500);
 
-var largestUpvotes = {};
 
 function fetchRedditPosts(callback) {
-	console.log('fetching posts');
 	currentlyFetching = true;
 	$.ajax({
 		url: 'https://www.reddit.com/r/'+ subreddits.join('+') +'/hot.json?limit=100',
@@ -129,8 +157,8 @@ function fetchRedditPosts(callback) {
 			// 	oldestPost.id = post.data.id;
 			// }
 
-			if(!largestUpvotes[post.data.subreddit] || post.data.score > largestUpvotes[post.data.subreddit]){
-				largestUpvotes[post.data.subreddit] = post.data.score;
+			if(!highestUpvotes[post.data.subreddit] || post.data.score > highestUpvotes[post.data.subreddit]){
+				highestUpvotes[post.data.subreddit] = post.data.score;
 			}
 
 		});
