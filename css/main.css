@@ -31,19 +31,6 @@ body, h1, h2, h3, h4, p, span {
 	color: #fff;
 }
 
-.post.big .title{
-	font-size: 2.5em;
-}
-.post.large .title{
-	font-size: 2em;
-}
-.post.medium .title{
-	font-size: 1.5em;
-}
-.post.small .title{
-	font-size: 1em;
-}
-
 /*.post:hover .details{
 	display: block;
 }*/
