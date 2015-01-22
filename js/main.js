@@ -126,10 +126,21 @@ function addPostToDOM(){
 			// debounceHideDetails(this);
 		});
 
+		cleanup();
+
 	}
 	else{
 
 	}
+}
+
+function cleanup(){
+	$('.post').each(function(index, el){
+		var $el = $(el)
+		if($el.offset().top < -$el.height()){
+			$el.remove();
+		}
+	});
 }
 
 var debounceShowDetails = _.debounce(function(self){

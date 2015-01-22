@@ -12,7 +12,7 @@ body, h1, h2, h3, h4, p, span {
 }
 #subredditContainer {
 	height: 2em;
-	background-color: #f00;
+	/*background-color: #cee3f8;*/
 	width: 100%;
 	z-index: 10;
 	position: relative;
