@@ -1,53 +1,57 @@
 $(document).ready(function() {
-	startInterval();
-	addSubredditsToTitle();
-	addPostToDOM();
 	getLocalStorage();
+	addSubredditsToTitle();
+	// addPostToDOM();
+	addAnother();
+	startInterval();
 	window.onbeforeunload = beforeUnload;
 });
 
 var subreddits = [
-	'usnews',
-	'worldnews',
-	'news'
-]
-
-var oldestPost = {
-	timestamp: null,
-	id: null
-};
-var newestPost = {
-	timestamp: null,
-	id: null
-};
+	{
+		name: 'News',
+		feed: 'hot'
+	},
+	{
+		name: 'WorldNews',
+		feed: 'hot'
+	}
+];
 
 var redditPosts = [];
 var postsSeen = {};
 var highestUpvotes = {};
 var interval;
-var currentlyFetching = false;
+var postsPerSubreddit = 20;
 
+
+function startInterval(){
+	interval = setInterval(addAnother, 2000);
+}
+
+function getLocalStorage() {
+	var postsSeenLS = JSON.parse(localStorage.getItem('postsSeen'));
+	postsSeen = (postsSeenLS) ? postsSeenLS : {};
+
+	var subredditsLS = JSON.parse(localStorage.getItem('subreddits'));
+	subreddits = (subredditsLS) ? subredditsLS : subreddits;
+
+	var postsPerSubredditLS = JSON.parse(localStorage.getItem('postsPerSubreddit'));
+	postsPerSubreddit = (postsPerSubredditLS) ? postsPerSubredditLS : postsPerSubreddit;
+}
+function saveLocalStorage() {
+	localStorage.setItem('postsSeen', JSON.stringify(postsSeen));
+	localStorage.setItem('subreddits', JSON.stringify(subreddits));
+}
 function beforeUnload(){
 	saveLocalStorage();
 	return null; // any non-void return will create an alert to the user
 }
 
-function startInterval(){
-	interval = setInterval(addPostToDOM, 2000);
-}
-
-function getLocalStorage() {
-	var postsSeenLS = JSON.parse(localStorage.getItem('postsSeen'))
-	postsSeen = (postsSeenLS) ? postsSeenLS : {};
-}
-function saveLocalStorage() {
-	localStorage.setItem('postsSeen', JSON.stringify(postsSeen));
-}
-
 function addSubredditsToTitle(){
 	var subsForDisplay = '';
 	for(var i=0; i<subreddits.length; i++){
-		subsForDisplay += '/r/' + subreddits[i];
+		subsForDisplay += '/r/' + subreddits[i].name;
 		// if(i < subreddits.length - 1){
 		// 	subsForDisplay += ', & ';
 		// }
@@ -60,31 +64,77 @@ function addSubredditsToTitle(){
 	$('#fromSubreddits').text(subsForDisplay);
 }
 
-function addPostToDOM(){
-	if(redditPosts.length < 5 && !currentlyFetching){
-		currentlyFetching = true;
-		fetchRedditPosts(addPostToDOM);
-	}
-	else if (!currentlyFetching) {
-		var post = redditPosts.pop();
+function addAnother (){
+	grabOnePost()
+	.then(addPostToDOM, qError);
 
-		var seen = false;
-		var scoreDiff = 0;
-		if(post.id in postsSeen){
-			seen = true;
-			scoreDiff = post.score - postsSeen[post.id];
+	cleanup();
+}
+
+function qError (err) {
+	console.debug('Error', err);
+}
+
+
+var postCount = 0;
+var activeSubreddit = 0;
+function grabOnePost(){
+	var deferred = Q.defer();
+
+	if(++postCount >= postsPerSubreddit){
+		// time to move onto the next subreddit
+		postCount = 0;
+		if(activeSubreddit +1 >= subreddits.length){
+			// you're reached the end of the line. Head back to the start
+			activeSubreddit = 0;
 		}
+		else{
+			// next sub
+			activeSubreddit++;
+		}
+	}
 
+	var arrayOfPosts = redditPosts[subreddits[activeSubreddit].name] || [];
+
+	if(arrayOfPosts.length < 10){
+		fetchRedditPosts(subreddits[activeSubreddit]);
+	}
+
+	if(arrayOfPosts.length){ // there's at least one post
+		var post = arrayOfPosts.shift(); // grab the post from
+
+		post.seen = false;
+		if(post.id in postsSeen || post.clicked){
+			post.seen = true;
+			post.scoreDiff = post.score - postsSeen[post.id];
+		}
 		postsSeen[post.id] = post.score;
 
+		deferred.resolve(post);
+	}
+	else{
+		deferred.reject('Not Enough Posts, grabbing more');
+	}
+
+	return deferred.promise;
+}
+
+function addPostToDOM(post){
 		var newPost = $('<div class="post"></div>');
 
-		// var title = $('<div>').addClass('title').text('/r/'+post.subreddit + ' ' + post.title);
-		var titleText = (seen) ? post.title : '<i class="fa fa-certificate"></i> ' + post.title;
-		titleText += (scoreDiff >= 50) ? ' <i class="fa fa-line-chart"></i> +' + scoreDiff.toLocaleString() : '';
+		var titleText = '';
+		titleText += (post.seen) ? '' : '<i class="fa fa-certificate"></i> ';
+		titleText += '<span class="subreddit">/r/'+post.subreddit + '</span> ';
+		titleText += post.title
+
+		if(post.link_flair_text){
+			titleText += '[' + link_flair_text + ']';
+		}
+
+		// var titleText = (post.seen) ? post.title : '<i class="fa fa-certificate"></i> ' + post.title;
+		titleText += (post.scoreDiff >= 50) ? ' <i class="fa fa-line-chart"></i> +' + post.scoreDiff.toLocaleString() : '';
 		var title = $('<div>').addClass('title').html(titleText);
 		newPost.append(title);
-
 
 		// TODO: move this to an Underscore template
 		var details = $('<div>').addClass('details');
@@ -125,13 +175,6 @@ function addPostToDOM(){
 			$(this).children('.details').hide('slow');
 			// debounceHideDetails(this);
 		});
-
-		cleanup();
-
-	}
-	else{
-
-	}
 }
 
 function cleanup(){
@@ -148,16 +191,20 @@ var debounceShowDetails = _.debounce(function(self){
 	}, 500);
 
 
-function fetchRedditPosts(callback) {
-	currentlyFetching = true;
+function fetchRedditPosts(subreddit, callback) {
 	$.ajax({
-		url: 'https://www.reddit.com/r/'+ subreddits.join('+') +'/hot.json?limit=100',
+		url: 'https://www.reddit.com/r/'+ subreddit.name +'/'+ subreddit.feed +'.json?limit=100',
 		// url: 'sampleRedditData.json',
 		cache: false
 	}).done(function(data) {
-		console.log('posts back from reddit',data.data.children.length)
+		// console.log('posts back from reddit',data.data.children.length)
 		data.data.children.forEach(function(post) {
-			redditPosts.push(post.data);
+
+			if(typeof redditPosts[subreddit.name] === 'undefined'){
+				redditPosts[subreddit.name] = [];
+			}
+
+			redditPosts[subreddit.name].push(post.data);
 
 			// if(post.data.created_utc > newestPost.timestamp) {
 			// 	newestPost.timestamp = post.data.created_utc;
@@ -177,7 +224,6 @@ function fetchRedditPosts(callback) {
 		if(callback) {
 			callback();
 		}
-		currentlyFetching = false;
 	});
 }
 
