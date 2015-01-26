@@ -41,6 +41,9 @@ var highestUpvotes = {};
 var interval;
 var postsPerSubreddit = 20;
 
+$(document).on('open', '.remodal', function () {
+	console.log('modal opened');
+});
 
 function startInterval(){
 	interval = setInterval(addAnother, 2000);
@@ -118,12 +121,6 @@ function setSubreddit(subId){
 function updateActiveSubreddit(subId){
 	var currentlyActive = $('#activeSubreddit li');
 	var currentlyActiveId = currentlyActive.data('subId');
-	// if(currentlyActiveId > 0){
-	// 	currentlyActive.insertAfter('#inactiveSubreddits li[data-subId='+ (subId - 1) +']');
-	// }
-	// else {
-	// 	currentlyActive.insertBefore('#inactiveSubreddits li[data-subId='+ (subId + 1) +']');
-	// }
 
 	currentlyActive.appendTo('#inactiveSubreddits');
 
@@ -166,6 +163,9 @@ function grabOnePost(){
 			post.seen = true;
 			post.scoreDiff = post.score - postsSeen[post.id];
 		}
+		else{
+			post.scoreDiff = 0;;
+		}
 		postsSeen[post.id] = post.score;
 
 		deferred.resolve(post);
@@ -177,46 +177,65 @@ function grabOnePost(){
 	return deferred.promise;
 }
 
+function printSomeShit(){
+	var template = _.template($('#post').html());
+
+	var putThisInThere = template({myVar: 'yo dawg', showThisToo: true});
+
+	$('#activeSubreddit').append(putThisInThere);
+}
+
 function addPostToDOM(post){
-	var newPost = $('<div class="post"></div>');
-
-	var colorBar = $('<div class="colorBar"></div>');
-	colorBar.css('background-color', subreddits[activeSubreddit].color);
-	colorBar.appendTo(newPost);
-
-	var titleText = '';
-	titleText += (post.seen) ? '' : '<i class="fa fa-certificate"></i> ';
-	// titleText += '<span class="subreddit">/r/'+post.subreddit + '</span> ';
-	titleText += post.title
-
-	if(post.link_flair_text){
-		titleText += ' [' + post.link_flair_text + ']';
-	}
-
-	// var titleText = (post.seen) ? post.title : '<i class="fa fa-certificate"></i> ' + post.title;
-	titleText += (post.scoreDiff >= 50) ? ' <i class="fa fa-line-chart"></i> +' + post.scoreDiff.toLocaleString() : '';
-	var title = $('<div>').addClass('title').html(titleText);
-	newPost.append(title);
-
-	// TODO: move this to an Underscore template
-	var details = $('<div>').addClass('details');
-	var detailsBody = '<a href="https://reddit.com/r/'+post.subreddit+'">/r/'+post.subreddit+'</a> '
-		detailsBody += '<i class="fa fa-arrow-up"></i> '
-		detailsBody += post.score.toLocaleString() + ' ';
-		detailsBody += '<a href="https://reddit.com'+post.permalink+'" target="_blank"><i class="fa fa-reddit"></i></a> ';
-		detailsBody += '<a href="'+post.url+'" target="_blank"><i class="fa fa-external-link"></i></a> ';
-		detailsBody += '<a href="https://reddit.com'+post.permalink+'" target="_blank"><i class="fa fa-comments-o"></i>'+post.num_comments.toLocaleString()+'</a> ';
-		detailsBody += 'Posted by /u/'+post.author + ' ';
-		detailsBody += '<span data-livestamp="'+post.created_utc+'"></span>';
-	details.html(detailsBody);
-	newPost.append(details);
+	window.aPost = post;
 
 	var sizePercent = post.score / highestUpvotes[post.subreddit];
 
 	// in ems
 	var fontSize = (sizePercent * 2) + 1;
 
-	newPost.children('.title').css('font-size', fontSize + 'em');
+
+	post.subColor = subreddits[activeSubreddit].color
+	post.headlineSize = fontSize;
+
+	var postTemplate = _.template($('#post').html());
+
+	var newPost = $(postTemplate(post));
+
+
+	// var newPost = $('<div class="post"></div>');
+
+	// var colorBar = $('<div class="colorBar"></div>');
+	// colorBar.css('background-color', subreddits[activeSubreddit].color);
+	// colorBar.appendTo(newPost);
+
+	// var titleText = '';
+	// titleText += (post.seen) ? '' : '<i class="fa fa-certificate"></i> ';
+	// // titleText += '<span class="subreddit">/r/'+post.subreddit + '</span> ';
+	// titleText += post.title
+
+	// if(post.link_flair_text){
+	// 	titleText += ' [' + post.link_flair_text + ']';
+	// }
+
+	// // var titleText = (post.seen) ? post.title : '<i class="fa fa-certificate"></i> ' + post.title;
+	// titleText += (post.scoreDiff >= 50) ? ' <i class="fa fa-line-chart"></i> +' + post.scoreDiff.toLocaleString() : '';
+	// var title = $('<div>').addClass('title').html(titleText);
+	// newPost.append(title);
+
+	// // TODO: move this to an Underscore template
+	// var details = $('<div>').addClass('details');
+	// var detailsBody = '<a href="https://reddit.com/r/'+post.subreddit+'">/r/'+post.subreddit+'</a> '
+	// 	detailsBody += '<i class="fa fa-arrow-up"></i> '
+	// 	detailsBody += post.score.toLocaleString() + ' ';
+	// 	detailsBody += '<a href="https://reddit.com'+post.permalink+'" target="_blank"><i class="fa fa-reddit"></i></a> ';
+	// 	detailsBody += '<a href="'+post.url+'" target="_blank"><i class="fa fa-external-link"></i></a> ';
+	// 	detailsBody += '<a href="https://reddit.com'+post.permalink+'" target="_blank"><i class="fa fa-comments-o"></i>'+post.num_comments.toLocaleString()+'</a> ';
+	// 	detailsBody += 'Posted by /u/'+post.author + ' ';
+	// 	detailsBody += '<span data-livestamp="'+post.created_utc+'"></span>';
+	// details.html(detailsBody);
+	// newPost.append(details);
+
+	// newPost.children('.title').css('font-size', fontSize + 'em');
 
 	newPost.css({
 		display: 'none'
@@ -228,14 +247,10 @@ function addPostToDOM(post){
 
 	newPost.appendTo('#postContainer').slideDown(speed);
 
-	newPost.hover(function(){
+	newPost.click(function(){
 		// mouseenter
 		// $(this).children('.details').show('slow');
 		debounceShowDetails(this);
-	}, function(){
-		// mouseleave
-		$(this).children('.details').hide('slow');
-		// debounceHideDetails(this);
 	});
 }
 

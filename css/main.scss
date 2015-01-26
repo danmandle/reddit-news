@@ -1,0 +1,114 @@
+@import url(https://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700);
+body, h1, h2, h3, h4, p, span {
+	font-family: 'Open Sans';
+	color: #eee;
+	line-height: 1.25;
+}
+
+body {
+	background-color: #171717;
+}
+.wrapper {
+	position: relative;
+	height: 100%;
+}
+
+#subredditContainer {
+	height: 2.5em;
+	background-color: #000;
+	width: 100%;
+	z-index: 10;
+	position: relative;
+	ul {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		li {
+			padding:10px;
+			color: #fff;
+		}
+	}
+	#activeSubreddit {
+		float:left;
+		font-weight: bolder;
+	}
+	#inactiveSubreddits {
+		float:right;
+		background-color: #000;
+		li {
+			float:left;
+			opacity: 0.5;
+			cursor: hand;
+			&:hover {
+				opacity: 1;
+			}
+		}
+	}
+}
+
+#settings {
+	position: relative;
+	float: right;
+	margin: 1em;
+	font-size: 1.5em;
+	z-index: 100;
+	opacity: 0.4;
+	text-decoration: none;
+	&:hover {
+		opacity: 1;
+	}
+	a {
+		color: #FFFFFF;
+		text-decoration: none;
+		border-bottom: none;
+	}
+}
+
+#postContainer {
+	position: absolute;
+	bottom: 0;
+	width: 100%;
+	z-index: 1;
+}
+.post {
+	padding: 10px 0 10px 10px;
+	position: relative;
+	.colorBar {
+		top: 0;
+		left: 0;
+		height: 100%;
+		width: 0.4em;
+		position: absolute;
+	}
+	.title {
+		.fa-certificate {
+			color: #FFD353;
+		}
+	}
+	.details {
+		display:none;
+		a {
+			color: #fff;
+		}
+	}
+}
+
+.remodal {
+	text-align: left;
+	h1, h2, h3, h4, p, span {
+		color: #000;
+		text-align: left;
+	}
+	h1 {
+		font-size: 2.5em;
+	}
+	h2 {
+		font-size: 2em;
+	}
+	h3 {
+		font-size: 1.5em;
+	}
+	h4 {
+		font-size: 1.25em;
+	}
+}

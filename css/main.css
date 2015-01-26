@@ -1,76 +1,89 @@
 @import url(https://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700);
 body, h1, h2, h3, h4, p, span {
-	font-family: 'Open Sans';
-	background-color: #000;
-	color: #eee;
-	line-height: 1.25;
-}
+  font-family: 'Open Sans';
+  color: #eee;
+  line-height: 1.25; }
+
+body {
+  background-color: #171717; }
 
 .wrapper {
-	position: relative;
-	height: 100%;
-}
+  position: relative;
+  height: 100%; }
+
 #subredditContainer {
-	height: 2.5em;
-	background-color: #000;
-	width: 100%;
-	z-index: 10;
-	position: relative;
-}
-#subredditContainer ul {
-	list-style: none;
-	padding: 0;
-	margin: 0;
-}
-#subredditContainer ul li{
-	padding:10px;
-	color: #fff;
-}
-#subredditContainer #activeSubreddit{
-	float:left;
-}
-#subredditContainer #inactiveSubreddits{
-	float:right;
-	background-color: #000;
-}
-#subredditContainer #inactiveSubreddits li{
-	float:left;
-	opacity: 0.5;
-	cursor: hand;
-}
-#subredditContainer #inactiveSubreddits li:hover{
-	opacity: 1;
-}
+  height: 2.5em;
+  background-color: #000;
+  width: 100%;
+  z-index: 10;
+  position: relative; }
+  #subredditContainer ul {
+    list-style: none;
+    padding: 0;
+    margin: 0; }
+    #subredditContainer ul li {
+      padding: 10px;
+      color: #fff; }
+  #subredditContainer #activeSubreddit {
+    float: left;
+    font-weight: bolder; }
+  #subredditContainer #inactiveSubreddits {
+    float: right;
+    background-color: #000; }
+    #subredditContainer #inactiveSubreddits li {
+      float: left;
+      opacity: 0.5;
+      cursor: hand; }
+      #subredditContainer #inactiveSubreddits li:hover {
+        opacity: 1; }
+
+#settings {
+  position: relative;
+  float: right;
+  margin: 1em;
+  font-size: 1.5em;
+  z-index: 100;
+  opacity: 0.4;
+  text-decoration: none; }
+  #settings:hover {
+    opacity: 1; }
+  #settings a {
+    color: #FFFFFF;
+    text-decoration: none;
+    border-bottom: none; }
 
 #postContainer {
-	position: absolute;
-	bottom: 0;
-	width: 100%;
-	z-index: 1;
-}
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  z-index: 1; }
+
 .post {
-	padding: 10px 0 10px 10px;
-	position: relative;
-}
+  padding: 10px 0 10px 10px;
+  position: relative; }
+  .post .colorBar {
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 0.4em;
+    position: absolute; }
+  .post .title .fa-certificate {
+    color: #FFD353; }
+  .post .details {
+    display: none; }
+    .post .details a {
+      color: #fff; }
 
-.post .details {
-	display:none;
-}
-.post .details a{
-	color: #fff;
-}
-.post .title .fa-certificate{
-	color: #FFD353;
-}
-
-.colorBar {
-	top: 0;
-	left: 0;
-	height: 100%;
-	width: 5px;
-	position: absolute;
-}
-
-/*.post:hover .details{
-	display: block;
-}*/
+.remodal {
+  text-align: left; }
+  .remodal h1, .remodal h2, .remodal h3, .remodal h4, .remodal p, .remodal span {
+    color: #000;
+    text-align: left; }
+  .remodal h1 {
+    font-size: 2.5em; }
+  .remodal h2 {
+    font-size: 2em; }
+  .remodal h3 {
+    font-size: 1.5em; }
+  .remodal h4 {
+    font-size: 1.25em; }
