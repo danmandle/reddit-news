@@ -1,7 +1,7 @@
 $(document).ready(function() {
 	getLocalStorage();
 	addSubredditsToTitle();
-	// addPostToDOM();
+	chooseRandomSub();
 	addAnother();
 	startInterval();
 	window.onbeforeunload = beforeUnload;
@@ -10,11 +10,28 @@ $(document).ready(function() {
 var subreddits = [
 	{
 		name: 'News',
-		feed: 'hot'
+		feed: 'hot',
+		color: '#84D9C9'
+	},
+	{
+		name: 'Technology',
+		feed: 'hot',
+		color: '#4D8C7A'
+	},
+	{
+		name: 'ShowerThoughts',
+		feed: 'hot',
+		color: '#D9BC2B'
+	},
+	{
+		name: 'NotTheOnion',
+		feed: 'hot',
+		color: '#D93D3D'
 	},
 	{
 		name: 'WorldNews',
-		feed: 'hot'
+		feed: 'hot',
+		color: '#F27C38'
 	}
 ];
 
@@ -60,6 +77,18 @@ function addSubredditsToTitle(){
 			// end of subs
 			subsForDisplay += ', ';
 		}
+
+		var sub = $('<li></li>');
+		sub.css({
+			'background-color': subreddits[i].color,
+		});
+		sub.text('/r/' + subreddits[i].name);
+		sub.attr('data-subid', i);
+		sub.click(function(e){
+			setSubreddit($(e.currentTarget).data('subid'));
+		})
+
+		$('#inactiveSubreddits').append(sub);
 	}
 	$('#fromSubreddits').text(subsForDisplay);
 }
@@ -75,6 +104,33 @@ function qError (err) {
 	console.debug('Error', err);
 }
 
+function chooseRandomSub(){
+	var subId = Math.floor(Math.random() * (subreddits.length - 1));
+	setSubreddit(subId);
+}
+
+function setSubreddit(subId){
+	postCount = 0;
+	activeSubreddit = subId;
+	updateActiveSubreddit(subId);
+}
+
+function updateActiveSubreddit(subId){
+	var currentlyActive = $('#activeSubreddit li');
+	var currentlyActiveId = currentlyActive.data('subId');
+	// if(currentlyActiveId > 0){
+	// 	currentlyActive.insertAfter('#inactiveSubreddits li[data-subId='+ (subId - 1) +']');
+	// }
+	// else {
+	// 	currentlyActive.insertBefore('#inactiveSubreddits li[data-subId='+ (subId + 1) +']');
+	// }
+
+	currentlyActive.appendTo('#inactiveSubreddits');
+
+	$('#subredditContainer').css('background-color', subreddits[subId].color);
+
+	$('#inactiveSubreddits li[data-subId='+ subId +']').appendTo('#activeSubreddit');
+}
 
 var postCount = 0;
 var activeSubreddit = 0;
@@ -92,6 +148,8 @@ function grabOnePost(){
 			// next sub
 			activeSubreddit++;
 		}
+
+		updateActiveSubreddit(activeSubreddit);
 	}
 
 	var arrayOfPosts = redditPosts[subreddits[activeSubreddit].name] || [];
@@ -101,7 +159,7 @@ function grabOnePost(){
 	}
 
 	if(arrayOfPosts.length){ // there's at least one post
-		var post = arrayOfPosts.shift(); // grab the post from
+		var post = arrayOfPosts.shift(); // grab the post from the front
 
 		post.seen = false;
 		if(post.id in postsSeen || post.clicked){
@@ -120,61 +178,69 @@ function grabOnePost(){
 }
 
 function addPostToDOM(post){
-		var newPost = $('<div class="post"></div>');
+	var newPost = $('<div class="post"></div>');
 
-		var titleText = '';
-		titleText += (post.seen) ? '' : '<i class="fa fa-certificate"></i> ';
-		titleText += '<span class="subreddit">/r/'+post.subreddit + '</span> ';
-		titleText += post.title
+	var colorBar = $('<div class="colorBar"></div>');
+	colorBar.css('background-color', subreddits[activeSubreddit].color);
+	colorBar.appendTo(newPost);
 
-		if(post.link_flair_text){
-			titleText += '[' + link_flair_text + ']';
-		}
+	var titleText = '';
+	titleText += (post.seen) ? '' : '<i class="fa fa-certificate"></i> ';
+	// titleText += '<span class="subreddit">/r/'+post.subreddit + '</span> ';
+	titleText += post.title
 
-		// var titleText = (post.seen) ? post.title : '<i class="fa fa-certificate"></i> ' + post.title;
-		titleText += (post.scoreDiff >= 50) ? ' <i class="fa fa-line-chart"></i> +' + post.scoreDiff.toLocaleString() : '';
-		var title = $('<div>').addClass('title').html(titleText);
-		newPost.append(title);
+	if(post.link_flair_text){
+		titleText += ' [' + post.link_flair_text + ']';
+	}
 
-		// TODO: move this to an Underscore template
-		var details = $('<div>').addClass('details');
-		var detailsBody = '<a href="https://reddit.com/r/'+post.subreddit+'">/r/'+post.subreddit+'</a> '
-			detailsBody += '<i class="fa fa-arrow-up"></i> '
-			detailsBody += post.score.toLocaleString() + ' ';
-			detailsBody += '<a href="https://reddit.com'+post.permalink+'" target="_blank"><i class="fa fa-reddit"></i></a> ';
-			detailsBody += '<a href="'+post.url+'" target="_blank"><i class="fa fa-external-link"></i></a> ';
-			detailsBody += '<a href="https://reddit.com'+post.permalink+'" target="_blank"><i class="fa fa-comments-o"></i>'+post.num_comments.toLocaleString()+'</a> ';
-			detailsBody += 'Posted by /u/'+post.author + ' ';
-			detailsBody += '<span data-livestamp="'+post.created_utc+'"></span>';
-		details.html(detailsBody);
-		newPost.append(details);
+	// var titleText = (post.seen) ? post.title : '<i class="fa fa-certificate"></i> ' + post.title;
+	titleText += (post.scoreDiff >= 50) ? ' <i class="fa fa-line-chart"></i> +' + post.scoreDiff.toLocaleString() : '';
+	var title = $('<div>').addClass('title').html(titleText);
+	newPost.append(title);
 
-		var sizePercent = post.score / highestUpvotes[post.subreddit];
+	// TODO: move this to an Underscore template
+	var details = $('<div>').addClass('details');
+	var detailsBody = '<a href="https://reddit.com/r/'+post.subreddit+'">/r/'+post.subreddit+'</a> '
+		detailsBody += '<i class="fa fa-arrow-up"></i> '
+		detailsBody += post.score.toLocaleString() + ' ';
+		detailsBody += '<a href="https://reddit.com'+post.permalink+'" target="_blank"><i class="fa fa-reddit"></i></a> ';
+		detailsBody += '<a href="'+post.url+'" target="_blank"><i class="fa fa-external-link"></i></a> ';
+		detailsBody += '<a href="https://reddit.com'+post.permalink+'" target="_blank"><i class="fa fa-comments-o"></i>'+post.num_comments.toLocaleString()+'</a> ';
+		detailsBody += 'Posted by /u/'+post.author + ' ';
+		detailsBody += '<span data-livestamp="'+post.created_utc+'"></span>';
+	details.html(detailsBody);
+	newPost.append(details);
 
-		// in ems
-		var fontSize = (sizePercent * 2) + 1;
+	var sizePercent = post.score / highestUpvotes[post.subreddit];
 
-		newPost.children('.title').css('font-size', fontSize + 'em');
+	// in ems
+	var fontSize = (sizePercent * 2) + 1;
 
-		newPost.css({
-			display: 'none'
-		});
+	newPost.children('.title').css('font-size', fontSize + 'em');
 
-		// newPost.appendTo('#postContainer').show('slow');
+	newPost.css({
+		display: 'none'
+	});
 
-		var speed = 500 * (1+(sizePercent*2));
+	// newPost.appendTo('#postContainer').show('slow');
 
-		newPost.appendTo('#postContainer').slideDown(speed);
+	var speed = 500 * (1+(sizePercent*2));
 
-		newPost.hover(function(){
-			// mouseenter
-			// $(this).children('.details').show('slow');
-			debounceShowDetails(this);
-		}, function(){
-			// mouseleave
-			$(this).children('.details').hide('slow');
-			// debounceHideDetails(this);
-		});
+	newPost.appendTo('#postContainer').slideDown(speed);
+
+	newPost.hover(function(){
+		// mouseenter
+		// $(this).children('.details').show('slow');
+		debounceShowDetails(this);
+	}, function(){
+		// mouseleave
+		$(this).children('.details').hide('slow');
+		// debounceHideDetails(this);
+	});
+}
+
+function stopAllThis(){
+	clearInterval(interval);
 }
 
 function cleanup(){

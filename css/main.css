@@ -11,12 +11,37 @@ body, h1, h2, h3, h4, p, span {
 	height: 100%;
 }
 #subredditContainer {
-	height: 2em;
-	/*background-color: #cee3f8;*/
+	height: 2.5em;
+	background-color: #000;
 	width: 100%;
 	z-index: 10;
 	position: relative;
 }
+#subredditContainer ul {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+#subredditContainer ul li{
+	padding:10px;
+	color: #fff;
+}
+#subredditContainer #activeSubreddit{
+	float:left;
+}
+#subredditContainer #inactiveSubreddits{
+	float:right;
+	background-color: #000;
+}
+#subredditContainer #inactiveSubreddits li{
+	float:left;
+	opacity: 0.5;
+	cursor: hand;
+}
+#subredditContainer #inactiveSubreddits li:hover{
+	opacity: 1;
+}
+
 #postContainer {
 	position: absolute;
 	bottom: 0;
@@ -24,7 +49,8 @@ body, h1, h2, h3, h4, p, span {
 	z-index: 1;
 }
 .post {
-	padding: 10px 0;
+	padding: 10px 0 10px 10px;
+	position: relative;
 }
 
 .post .details {
@@ -35,6 +61,14 @@ body, h1, h2, h3, h4, p, span {
 }
 .post .title .fa-certificate{
 	color: #FFD353;
+}
+
+.colorBar {
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 5px;
+	position: absolute;
 }
 
 /*.post:hover .details{
