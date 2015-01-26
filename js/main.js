@@ -201,54 +201,15 @@ function addPostToDOM(post){
 
 	var newPost = $(postTemplate(post));
 
-
-	// var newPost = $('<div class="post"></div>');
-
-	// var colorBar = $('<div class="colorBar"></div>');
-	// colorBar.css('background-color', subreddits[activeSubreddit].color);
-	// colorBar.appendTo(newPost);
-
-	// var titleText = '';
-	// titleText += (post.seen) ? '' : '<i class="fa fa-certificate"></i> ';
-	// // titleText += '<span class="subreddit">/r/'+post.subreddit + '</span> ';
-	// titleText += post.title
-
-	// if(post.link_flair_text){
-	// 	titleText += ' [' + post.link_flair_text + ']';
-	// }
-
-	// // var titleText = (post.seen) ? post.title : '<i class="fa fa-certificate"></i> ' + post.title;
-	// titleText += (post.scoreDiff >= 50) ? ' <i class="fa fa-line-chart"></i> +' + post.scoreDiff.toLocaleString() : '';
-	// var title = $('<div>').addClass('title').html(titleText);
-	// newPost.append(title);
-
-	// // TODO: move this to an Underscore template
-	// var details = $('<div>').addClass('details');
-	// var detailsBody = '<a href="https://reddit.com/r/'+post.subreddit+'">/r/'+post.subreddit+'</a> '
-	// 	detailsBody += '<i class="fa fa-arrow-up"></i> '
-	// 	detailsBody += post.score.toLocaleString() + ' ';
-	// 	detailsBody += '<a href="https://reddit.com'+post.permalink+'" target="_blank"><i class="fa fa-reddit"></i></a> ';
-	// 	detailsBody += '<a href="'+post.url+'" target="_blank"><i class="fa fa-external-link"></i></a> ';
-	// 	detailsBody += '<a href="https://reddit.com'+post.permalink+'" target="_blank"><i class="fa fa-comments-o"></i>'+post.num_comments.toLocaleString()+'</a> ';
-	// 	detailsBody += 'Posted by /u/'+post.author + ' ';
-	// 	detailsBody += '<span data-livestamp="'+post.created_utc+'"></span>';
-	// details.html(detailsBody);
-	// newPost.append(details);
-
-	// newPost.children('.title').css('font-size', fontSize + 'em');
-
 	newPost.css({
 		display: 'none'
 	});
-
-	// newPost.appendTo('#postContainer').show('slow');
 
 	var speed = 500 * (1+(sizePercent*2));
 
 	newPost.appendTo('#postContainer').slideDown(speed);
 
 	newPost.click(function(){
-		// mouseenter
 		// $(this).children('.details').show('slow');
 		debounceShowDetails(this);
 	});
