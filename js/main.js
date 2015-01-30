@@ -47,6 +47,7 @@ var highestUpvotes = {};
 var interval;
 var postsPerSubreddit = 20;
 var addSpeed = 2000;
+var seenCleanUp = 0;
 
 $(document).on('open', '.remodal', readSettings);
 $('#saveSettings').click(saveSettings);
@@ -291,12 +292,15 @@ function grabOnePost(){
 		post.seen = false;
 		if(post.id in postsSeen || post.clicked){
 			post.seen = true;
-			post.scoreDiff = post.score - postsSeen[post.id];
+			post.scoreDiff = post.score - postsSeen[post.id].score;
 		}
 		else{
 			post.scoreDiff = 0;;
 		}
-		postsSeen[post.id] = post.score;
+		postsSeen[post.id] = {
+			score: post.score,
+			seenAt: new Date()
+		};
 
 		deferred.resolve(post);
 	}
@@ -305,14 +309,6 @@ function grabOnePost(){
 	}
 
 	return deferred.promise;
-}
-
-function printSomeShit(){
-	var template = _.template($('#post').html());
-
-	var putThisInThere = template({myVar: 'yo dawg', showThisToo: true});
-
-	$('#activeSubreddit').append(putThisInThere);
 }
 
 function addPostToDOM(post){
@@ -353,6 +349,17 @@ function cleanup(){
 			$el.remove();
 		}
 	});
+
+	var timeDiff = moment().diff(seenCleanUp, 'hours');
+
+	if(timeDiff > 1) {
+		_.each(postsSeen, function(postId, details){
+			if(moment().diff(details.seenAt, 'days') > 3){ // three days sounds reasonable, right?
+				delete postsSeen[postId];
+			}
+		});
+	}
+
 }
 
 var debounceShowDetails = _.debounce(function(self){

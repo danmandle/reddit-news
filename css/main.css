@@ -67,8 +67,10 @@ body {
     height: 100%;
     width: 0.4em;
     position: absolute; }
-  .post .title .fa-certificate {
-    color: #FFD353; }
+  .post .title {
+    cursor: pointer; }
+    .post .title .fa-certificate {
+      color: #FFD353; }
   .post .details {
     display: none; }
     .post .details a {
