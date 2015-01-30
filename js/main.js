@@ -7,46 +7,167 @@ $(document).ready(function() {
 	window.onbeforeunload = beforeUnload;
 });
 
-var subreddits = [
-	{
-		name: 'News',
-		feed: 'hot',
-		color: '#84D9C9'
-	},
-	{
-		name: 'Technology',
-		feed: 'hot',
-		color: '#4D8C7A'
-	},
-	{
-		name: 'ShowerThoughts',
-		feed: 'hot',
-		color: '#D9BC2B'
-	},
-	{
-		name: 'NotTheOnion',
-		feed: 'hot',
-		color: '#D93D3D'
-	},
-	{
-		name: 'WorldNews',
-		feed: 'hot',
-		color: '#F27C38'
-	}
-];
 
+var defaults = {
+	subreddits: [
+		{
+			name: 'News',
+			feed: 'hot',
+			color: '#84D9C9'
+		},
+		{
+			name: 'Technology',
+			feed: 'hot',
+			color: '#4D8C7A'
+		},
+		{
+			name: 'ShowerThoughts',
+			feed: 'hot',
+			color: '#D9BC2B'
+		},
+		{
+			name: 'NotTheOnion',
+			feed: 'hot',
+			color: '#D93D3D'
+		},
+		{
+			name: 'WorldNews',
+			feed: 'hot',
+			color: '#F27C38'
+		}
+	],
+	postsPerSubreddit: 20,
+	addSpeed: 2000
+}
+
+var subreddits = [];
 var redditPosts = [];
 var postsSeen = {};
 var highestUpvotes = {};
 var interval;
 var postsPerSubreddit = 20;
+var addSpeed = 2000;
 
-$(document).on('open', '.remodal', function () {
-	console.log('modal opened');
+$(document).on('open', '.remodal', readSettings);
+$('#saveSettings').click(saveSettings);
+$('#resetDefaults').click(function(){
+	localStorage.clear();
+	getLocalStorage();
+	window.location.reload();
 });
+function readSettings(){
+	$('#addPostTiming').val((addSpeed/1000).toFixed(1));
+	$('#postsPerSub').val(postsPerSubreddit);
+
+	var subsDiv = $('.remodal #subs').empty();
+
+	var settingSubTemplate = _.template($('#settingSub').html());
+
+	for(var i=0; i < subreddits.length; i++){
+		insertSubsInSettings(subreddits[i]);
+	}
+
+	editSubredditSettings();
+}
+
+function editSubredditSettings(e){
+	var subData = {}
+	if(e){
+		var $el = $(e.currentTarget).parent();
+		subData = {
+			name: $el.attr('data-name'),
+			color: $el.attr('data-color'),
+			feed: $el.attr('data-feed')
+		}
+	}
+	else{
+		subData = {
+			name: '',
+			color: '#84D9C9',
+			feed: 'hot'
+		}
+	}
+
+	var settingNewSubTemplate = _.template($('#settingNewSub').html());
+
+	var newSub = $(settingNewSubTemplate(subData));
+
+	console.log('color:', subData.color);
+
+	newSub.find('.colorSelector').ColorPicker({
+		color: subData.color,
+		onShow: function (colpkr) {
+			$(colpkr).fadeIn(500);
+			return false;
+		},
+		onHide: function (colpkr) {
+			$(colpkr).fadeOut(500);
+			return false;
+		},
+		onChange: function (hsb, hex, rgb) {
+			$('.colorSelector').css('backgroundColor', '#' + hex).attr('data-color', '#' + hex);
+		}
+	});
+
+	newSub.find('button').click(function(e){
+		$el = $(e.currentTarget).parent();
+		subData = {
+			name: $el.children('input#subName').val(),
+			color: $el.children('.colorSelector').attr('data-color'),
+			feed: $('select option:selected').text()
+		}
+		$el.remove();
+
+		insertSubsInSettings(subData);
+
+
+		editSubredditSettings();
+
+	})
+
+	newSub.appendTo($('.remodal #subs'));
+}
+
+function insertSubsInSettings(data){
+	var settingSubTemplate = _.template($('#settingSub').html());
+	var newSub = $(settingSubTemplate(data));
+
+	newSub.find('.edit').click(function(e){
+		$('.settingNewSub').remove();
+		editSubredditSettings(e);
+		$(e.currentTarget).parent().remove();
+	});
+	newSub.find('.remove').click(function(e){
+		$(e.currentTarget).parent().remove();
+	});
+
+	$('.remodal #subs').append(newSub);
+}
+
+function saveSettings(){
+	addSpeed = $('#addPostTiming').val() * 1000;
+	clearInterval(interval);
+	startInterval();
+
+	postsPerSubreddit = $('#postsPerSub').val();
+
+	subreddits = [];
+	$('.settingSub').each(function(index, el){
+		var $el = $(el);
+		subreddits.push({
+			name: $el.attr('data-name'),
+			color: $el.attr('data-color'),
+			feed: $el.attr('data-feed')
+		});
+	});
+
+	addSubredditsToTitle();
+
+	saveLocalStorage();
+}
 
 function startInterval(){
-	interval = setInterval(addAnother, 2000);
+	interval = setInterval(addAnother, addSpeed);
 }
 
 function getLocalStorage() {
@@ -54,14 +175,19 @@ function getLocalStorage() {
 	postsSeen = (postsSeenLS) ? postsSeenLS : {};
 
 	var subredditsLS = JSON.parse(localStorage.getItem('subreddits'));
-	subreddits = (subredditsLS) ? subredditsLS : subreddits;
+	subreddits = (subredditsLS) ? subredditsLS : defaults.subreddits;
 
 	var postsPerSubredditLS = JSON.parse(localStorage.getItem('postsPerSubreddit'));
-	postsPerSubreddit = (postsPerSubredditLS) ? postsPerSubredditLS : postsPerSubreddit;
+	postsPerSubreddit = (postsPerSubredditLS) ? postsPerSubredditLS : defaults.postsPerSubreddit;
+
+	var addSpeedLS = JSON.parse(localStorage.getItem('addSpeed'));
+	addSpeed = (addSpeedLS) ? addSpeedLS : defaults.addSpeed;
 }
 function saveLocalStorage() {
 	localStorage.setItem('postsSeen', JSON.stringify(postsSeen));
 	localStorage.setItem('subreddits', JSON.stringify(subreddits));
+	localStorage.setItem('postsPerSubreddit', postsPerSubreddit);
+	localStorage.setItem('addSpeed', addSpeed);
 }
 function beforeUnload(){
 	saveLocalStorage();
@@ -69,6 +195,9 @@ function beforeUnload(){
 }
 
 function addSubredditsToTitle(){
+	$('#activeSubreddit').empty();
+	$('#inactiveSubreddits').empty();
+
 	var subsForDisplay = '';
 	for(var i=0; i<subreddits.length; i++){
 		subsForDisplay += '/r/' + subreddits[i].name;
@@ -80,6 +209,7 @@ function addSubredditsToTitle(){
 			// end of subs
 			subsForDisplay += ', ';
 		}
+
 
 		var sub = $('<li></li>');
 		sub.css({
@@ -186,13 +316,10 @@ function printSomeShit(){
 }
 
 function addPostToDOM(post){
-	window.aPost = post;
-
 	var sizePercent = post.score / highestUpvotes[post.subreddit];
 
 	// in ems
 	var fontSize = (sizePercent * 2) + 1;
-
 
 	post.subColor = subreddits[activeSubreddit].color
 	post.headlineSize = fontSize;

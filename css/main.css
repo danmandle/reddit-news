@@ -87,3 +87,21 @@ body {
     font-size: 1.5em; }
   .remodal h4 {
     font-size: 1.25em; }
+  .remodal a {
+    text-decoration: none;
+    color: #000; }
+  .remodal #resetDefaults {
+    float: right;
+    padding: 10px; }
+  .remodal #subs .settingSub .colorBar {
+    width: 1em;
+    height: 1em;
+    display: inline-block; }
+  .remodal #subs .settingSub i {
+    cursor: pointer; }
+  .remodal #subs .settingNewSub .colorSelector {
+    width: 30px;
+    height: 30px;
+    background: url(../images/select.png) center;
+    display: inline-block;
+    margin-bottom: -10px; }

@@ -4,6 +4,7 @@
 	<link rel="stylesheet" type="text/css" href="css/gridless.css" />
 	<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
 	<link rel="stylesheet" type="text/css" href="css/jquery.remodal.css">
+	<link rel="stylesheet" type="text/css" href="css/colorpicker.css">
 	<link rel="stylesheet" type="text/css" href="css/main.css" />
 </head>
 
@@ -26,15 +27,17 @@
 	</div>
 
 	<div class="remodal" data-remodal-id="settings">
+	<button id='resetDefaults'><i class="fa fa-history"></i> Reset to Defaults</button>
 		<h1>Settings</h1>
 		<h2>Subreddits</h2>
-			<button>Add More</button>
+			<div id='subs'>
+			</div>
 		<h2>Other Settings</h2>
-			<p>Add a new post every <input type="number" name="addPostTiming" value="2.0"  min="0.1" max="20" step="0.1"></input> seconds</p>
-			<p>Show <input type="number" name="postsPerSub" value="20"  min="1" ></input> posts per subreddit before switching</p>
+			<p>Add a new post every <input type="number" id="addPostTiming" name="addPostTiming" value="2.0"  min="0.1" max="20" step="0.1"></input> seconds</p>
+			<p>Show <input type="number" id="postsPerSub" name="postsPerSub" value="20"  min="1" ></input> posts per subreddit before switching</p>
 		<br>
 		<a class="remodal-cancel" href="#">Cancel</a>
-		<a class="remodal-confirm" href="#">OK</a>
+		<a class="remodal-confirm" id="saveSettings" href="#">Save Changes</a>
 	</div>
 
 
@@ -45,6 +48,7 @@
 <script type="text/javascript" src='//cdnjs.cloudflare.com/ajax/libs/livestamp/1.1.2/livestamp.min.js'></script>
 <script type="text/javascript" src='//cdnjs.cloudflare.com/ajax/libs/q.js/1.1.2/q.js'></script>
 <script type="text/javascript" src='js/lib/jquery.remodal.min.js'></script>
+<script type="text/javascript" src='js/lib/colorpicker.js'></script>
 <script type="text/javascript" src='js/main.js'></script>
 
 <script type="text/template" id="post">
@@ -62,7 +66,7 @@
 			<%
 				if(scoreDiff >= 50){
 					%>
-					<i class="fa fa-line-chart"></i> <%= post.scoreDiff.toLocaleString() %>
+					<i class="fa fa-line-chart"></i> <%= scoreDiff.toLocaleString() %>
 					<%
 				}
 			%>
@@ -77,6 +81,26 @@
 		</div>
 	</div>
 </script>
+
+<script type="text/template" id="settingSub">
+	<div class="settingSub" data-color=<%= color %> data-name=<%= name %> data-feed=<%= feed %>>
+		<span class="colorBar" style="background-color:<%= color %>"></span> /r/<%= name %> <%= feed %> <i class="fa fa-pencil-square-o edit"></i> <i class="fa fa-times remove"></i>
+	</div>
+</script>
+
+<script type="text/template" id="settingNewSub">
+	<div class="settingNewSub">
+		Subreddit: /r/<input name="subName" id="subName" type="text" placeholder="WorldNews" value='<%= name %>'>
+		Color: <div class='colorSelector' style="background-color: <%= color %>"></div>
+		Feed: <select class='subFeed'>
+			<option selected="selected">hot</option>
+			<option>new</option>
+			<option>top</option>
+		</select>
+		<button><i class="fa fa-plus add"></i> Add Subreddit</button>
+	</div>
+</script>
+
 
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
