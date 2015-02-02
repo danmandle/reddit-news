@@ -26,6 +26,8 @@
 		</div>
 	</div>
 
+	<div id='sizeContainer'></div>
+
 	<div class="remodal" data-remodal-id="settings">
 	<button id='resetDefaults'><i class="fa fa-history"></i> Reset to Defaults</button>
 		<h1>Settings</h1>
@@ -54,7 +56,7 @@
 <script type="text/template" id="post">
 	<div class="post">
 		<div class="colorBar" style="background-color: <%= subColor %>;"></div>
-		<div class="title" style="font-size: <%= headlineSize %>em;">
+		<div class="title" style="font-size: <%= headlineSize %>rem;">
 			<%
 				if(!seen){
 					%>

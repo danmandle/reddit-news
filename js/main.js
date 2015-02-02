@@ -47,6 +47,12 @@ $('#resetDefaults').click(function() {
     window.location.reload();
 });
 
+// window.onresize = updateWindowSize;
+// updateWindowSize();
+// function updateWindowSize(){
+//     $('#sizeContainer').text('Width: ' + $('body').width());
+// };
+
 function readSettings() {
     $('#addPostTiming').val((addSpeed / 1000).toFixed(1));
     $('#postsPerSub').val(postsPerSubreddit);
@@ -267,7 +273,7 @@ function grabOnePost() {
 function addPostToDOM(post) {
     var sizePercent = post.score / highestUpvotes[post.subreddit];
     // in ems
-    var fontSize = (sizePercent * 2) + 1;
+    var fontSize = (sizePercent * 1.5) + 1;
     post.subColor = subreddits[activeSubreddit].color
     post.headlineSize = fontSize;
     var postTemplate = _.template($('#post').html());

@@ -207,7 +207,7 @@ body.remodal-is-active .remodal {
 
     display: block;
 
-    content: "×";
+    content: "X";
     cursor: pointer;
     -webkit-transition: all 0.2s ease-out;
     -moz-transition: all 0.2s ease-out;
