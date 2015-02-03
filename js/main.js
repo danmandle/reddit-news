@@ -33,6 +33,7 @@ var defaults = {
 	postsPerSubreddit: 20,
 	addSpeed: 2000
 }
+// for use with query string subreddits
 var prettyColors = [
 	'#7F1637',
 	'#047878',
@@ -54,6 +55,7 @@ var interval;
 var postsPerSubreddit = 20;
 var addSpeed = 2000;
 var seenCleanUp = 0;
+
 $(document).on('open', '.remodal', readSettings);
 $('#saveSettings').click(saveSettings);
 $('#resetDefaults').click(function() {
@@ -63,9 +65,8 @@ $('#resetDefaults').click(function() {
 });
 
 function grabQueryStrings(){
-	var name = 'subreddits';
 	var subs = '';
-	var regex = new RegExp("[\\?&]" + name + "=([^&#]*)")
+	var regex = new RegExp("[\\?&]" + 'subreddits' + "=([^&#]*)")
 
 	if(window.location.search){
         var results = regex.exec(location.search);
@@ -124,7 +125,6 @@ function editSubredditSettings(e) {
 	}
 	var settingNewSubTemplate = _.template($('#settingNewSub').html());
 	var newSub = $(settingNewSubTemplate(subData));
-	console.log('color:', subData.color);
 	newSub.find('.colorSelector').ColorPicker({
 		color: subData.color,
 		onShow: function(colpkr) {

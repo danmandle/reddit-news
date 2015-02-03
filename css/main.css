@@ -85,32 +85,32 @@ body {
     .post .details a {
       color: #fff; }
 
-.rremodal {
+.remodal {
   text-align: left; }
-  .rremodal h1, .rremodal h2, .rremodal h3, .rremodal h4, .rremodal p, .rremodal span {
+  .remodal h1, .remodal h2, .remodal h3, .remodal h4, .remodal p, .remodal span {
     color: #000;
     text-align: left; }
-  .rremodal h1 {
+  .remodal h1 {
     font-size: 2.5rem; }
-  .rremodal h2 {
+  .remodal h2 {
     font-size: 2rem; }
-  .rremodal h3 {
+  .remodal h3 {
     font-size: 1.5rem; }
-  .rremodal h4 {
+  .remodal h4 {
     font-size: 1.25rem; }
-  .rremodal a {
+  .remodal a {
     text-decoration: none;
     color: #000; }
-  .rremodal #resetDefaults {
+  .remodal #resetDefaults {
     float: right;
     padding: 10px; }
-  .rremodal #subs .settingSub .colorBar {
+  .remodal #subs .settingSub .colorBar {
     width: 1rem;
     height: 1rem;
     display: inline-block; }
-  .rremodal #subs .settingSub i {
+  .remodal #subs .settingSub i {
     cursor: pointer; }
-  .rremodal #subs .settingNewSub .colorSelector {
+  .remodal #subs .settingNewSub .colorSelector {
     width: 30px;
     height: 30px;
     background: url(../images/select.png) center;
