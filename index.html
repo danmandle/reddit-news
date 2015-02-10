@@ -2,7 +2,7 @@
 <head>
 	<title>Reddit News</title>
 	<link rel="stylesheet" type="text/css" href="css/gridless.css" />
-	<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+	<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
 	<link rel="stylesheet" type="text/css" href="css/jquery.remodal.css">
 	<link rel="stylesheet" type="text/css" href="css/colorpicker.css">
 	<link rel="stylesheet" type="text/css" href="css/main.css" />
@@ -15,18 +15,21 @@
 			</ul>
 			<ul id='inactiveSubreddits'></ul>
 		</div>
-		<div id='settings'><a href='#settings'><i class="fa fa-cog"></i></a></div>
+		<div id='settingsCog'><i class="fa fa-cog"></i></div>
 		<div id='postContainer'>
-			<div class='post'>
+			<div class='post intro'>
 				<h1><i class="fa fa-reddit"></i> News</h1>
 				<h3>Pulling headlines from <span id='fromSubreddits'></span></h3>
 				<p>The larger the headline, the more upvotes it has. <i class="fa fa-certificate"></i> means it's an unseen post. <i class="fa fa-line-chart"></i> means there have been 50+ upvotes since you've seen it last.</p>
 				<p>Created at <a href="http://www.movementstrategy.com" target="_blank">The Movement Strategy</a> by Dan Mandle</p>
 			</div>
+			<div id='loading'/>
+				<img src='images/loading3.gif' height="200" width="200" />
+			</div>
 		</div>
 	</div>
 
-	<div class="remodal" data-remodal-id="settings">
+	<div class="remodal" data-remodal-id="settings" data-remodal-options="hashTracking: false">
 	<button id='resetDefaults'><i class="fa fa-history"></i> Reset to Defaults</button>
 		<h1>Settings</h1>
 		<h2>Subreddits</h2>
@@ -41,14 +44,15 @@
 	</div>
 
 
-<script type="text/javascript" src='//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js'></script>
-<script type="text/javascript" src='//cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js'></script>
-<script type="text/javascript" src='//cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.3/moment.min.js'></script>
-<script type="text/javascript" src='//cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment.min.js'></script>
-<script type="text/javascript" src='//cdnjs.cloudflare.com/ajax/libs/livestamp/1.1.2/livestamp.min.js'></script>
-<script type="text/javascript" src='//cdnjs.cloudflare.com/ajax/libs/q.js/1.1.2/q.js'></script>
+<script type="text/javascript" src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js'></script>
+<script type="text/javascript" src='https://cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js'></script>
+<script type="text/javascript" src='https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.3/moment.min.js'></script>
+<script type="text/javascript" src='https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment.min.js'></script>
+<script type="text/javascript" src='https://cdnjs.cloudflare.com/ajax/libs/livestamp/1.1.2/livestamp.min.js'></script>
+<script type="text/javascript" src='https://cdnjs.cloudflare.com/ajax/libs/q.js/1.1.2/q.js'></script>
 <script type="text/javascript" src='js/lib/jquery.remodal.min.js'></script>
 <script type="text/javascript" src='js/lib/colorpicker.js'></script>
+<script type="text/javascript" src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js"></script>
 <script type="text/javascript" src='js/main.js'></script>
 
 <script type="text/template" id="post">
@@ -66,7 +70,7 @@
 			<%
 				if(scoreDiff >= 50){
 					%>
-					<i class="fa fa-line-chart"></i> <%= scoreDiff.toLocaleString() %>
+					<i class="fa fa-line-chart"></i> +<%= scoreDiff.toLocaleString() %>
 					<%
 				}
 			%>
@@ -106,7 +110,7 @@
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
   m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
   ga('create', 'UA-58342503-2', 'auto');
   ga('send', 'pageview');

@@ -14,7 +14,7 @@ body, h1, h2, h3, h4, p, span {
   line-height: 1.25; }
 
 body {
-  background-color: #171717; }
+  background-color: #2e2e2e; }
 
 .wrapper {
   position: relative;
@@ -46,26 +46,34 @@ body {
       #subredditContainer #inactiveSubreddits li:hover {
         opacity: 1; }
 
-#settings {
+#settingsCog {
   position: relative;
   float: right;
   margin: 1rem;
   font-size: 1.5rem;
   z-index: 100;
   opacity: 0.4;
-  text-decoration: none; }
-  #settings:hover {
+  text-decoration: none;
+  color: #FFFFFF;
+  text-decoration: none;
+  border-bottom: none; }
+  #settingsCog:hover {
     opacity: 1; }
-  #settings a {
-    color: #FFFFFF;
-    text-decoration: none;
-    border-bottom: none; }
 
 #postContainer {
   position: absolute;
   bottom: 0;
   width: 100%;
   z-index: 1; }
+  #postContainer #loading {
+    position: fixed;
+    top: 25%;
+    left: 0%;
+    width: 100%; }
+    #postContainer #loading img {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; }
 
 .post {
   padding: 10px 0 10px 10px;
